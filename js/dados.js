@@ -2920,6 +2920,10 @@ window.BuzuDados = (function () {
           (lp.dia_semana === diaReal || lp.dia_semana === 'todos')
         )
     );
+    // Paradas que esta linha atende no OUTRO dia: continuam com a linha mesmo fora do traçado deste dia
+    const paradasDaLinhaEmOutroDia = new Set(
+      outrosVinculos.filter(lp => String(lp.linha_id).toUpperCase() === numUpper).map(lp => String(lp.parada_id))
+    );
 
     const novosVinculosIda = [];
     const novosVinculosVolta = [];
@@ -2960,7 +2964,8 @@ window.BuzuDados = (function () {
       const rotasSet = new Set((p.rotas || []).map(r => String(r).toUpperCase()));
       if (ligou) {
         rotasSet.add(numUpper);
-      } else {
+        if (Array.isArray(p.dias_semana) && !p.dias_semana.includes(diaReal)) p.dias_semana.push(diaReal);
+      } else if (!paradasDaLinhaEmOutroDia.has(String(p.id))) {
         rotasSet.delete(numUpper);
       }
       p.rotas = Array.from(rotasSet);

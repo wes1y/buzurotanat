@@ -247,6 +247,39 @@
     </form>
   </dialog>
 
+  <dialog id="dlg-moovit" class="ed-dialogo ed-dialogo--largo" aria-labelledby="dlg-moovit-titulo">
+    <form method="dialog" id="form-moovit">
+      <h2 id="dlg-moovit-titulo"><i class="bi bi-box-arrow-in-down" aria-hidden="true"></i> Importar traçado do Moovit</h2>
+
+      <div id="moovit-passo-1">
+        <ol class="ed-passos">
+          <li><strong>Uma vez só:</strong> arraste o botão abaixo para a barra de favoritos do navegador.
+            <p class="ed-favorito"><a id="moovit-favorito" class="btn btn--primario" href="#" draggable="true"><i class="bi bi-bookmark-star" aria-hidden="true"></i> Exportar para o BuzuRota</a></p>
+            <small>Não clique nele aqui: ele só funciona dentro do editor do Moovit. Se a barra de favoritos estiver escondida, use <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>.</small>
+          </li>
+          <li>Entre no <a href="https://mooviters.moovit.com/editor/routes?dataSourceId=908" target="_blank" rel="noopener noreferrer">editor do Moovit</a>, abra a linha e clique na <strong>viagem ativa</strong> do dia que você quer (a página da viagem tem o endereço <code>/editor/trip/…</code>).</li>
+          <li>Clique no favorito <strong>Exportar para o BuzuRota</strong>. Vai baixar um arquivo <code>moovit-LINHA-….json</code>.</li>
+          <li>Aqui no editor, com a linha e o <strong>dia</strong> certos abertos, escolha esse arquivo:</li>
+        </ol>
+        <div class="acoes-form">
+          <button type="button" id="moovit-escolher" class="btn btn--primario"><i class="bi bi-upload" aria-hidden="true"></i> Escolher arquivo do Moovit</button>
+          <button type="submit" value="cancelar" class="btn" formnovalidate>Fechar</button>
+        </div>
+      </div>
+
+      <div id="moovit-passo-2" hidden>
+        <div id="moovit-resumo"></div>
+        <label for="moovit-retorno">Onde a <strong>ida</strong> termina e a <strong>volta</strong> começa (ponto de retorno)</label>
+        <select id="moovit-retorno"></select>
+        <p id="moovit-retorno-info"></p>
+        <div class="acoes-form">
+          <button type="submit" value="usar" id="moovit-usar" class="btn btn--primario"><i class="bi bi-check2" aria-hidden="true"></i> Usar este traçado</button>
+          <button type="submit" value="cancelar" class="btn" formnovalidate>Cancelar</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
   <input type="file" id="ed-arquivo" accept=".geojson,.json,.kml,.kmz" hidden>
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 </body>

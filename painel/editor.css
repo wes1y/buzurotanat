@@ -359,3 +359,13 @@ kbd { display: inline-block; min-width: 22px; padding: 1px 6px; border: 1px soli
   .ed-app { grid-template-columns: 240px 1fr 300px; }
   .ed-marca span, #ed-previa { display: none; }
 }
+
+/* Importar do Moovit */
+.ed-passos { margin: 4px 0 12px; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; font-size: 0.9rem; line-height: 1.5; }
+.ed-passos small { color: var(--texto-sec); }
+.ed-favorito { margin: 8px 0 4px; }
+.ed-favorito a { cursor: grab; }
+#moovit-retorno { width: 100%; margin: 4px 0 6px; }
+.ed-moovit-resumo { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin: 6px 0 14px; }
+.ed-moovit-resumo div { background: var(--superficie-2); border-radius: 9px; padding: 8px 10px; font-size: 0.85rem; }
+.ed-moovit-resumo strong { display: block; font-size: 0.95rem; }

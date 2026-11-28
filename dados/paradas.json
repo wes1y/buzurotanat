@@ -437,7 +437,8 @@
           "C1",
           "C8",
           "N-60",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -5266,7 +5267,8 @@
           "O-33",
           "O-33A",
           "O-41A",
-          "R14"
+          "R14",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -5328,7 +5330,8 @@
           "N-05",
           "O-33",
           "O-33A",
-          "R14"
+          "R14",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -7099,7 +7102,8 @@
           "O-24",
           "O-33",
           "O-33A",
-          "O-41A"
+          "O-41A",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -7531,7 +7535,8 @@
         "sentidos_atendidos": "AMBOS",
         "rotas": [
           "C4",
-          "O-21"
+          "O-21",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -7616,7 +7621,8 @@
           "L-52",
           "L-54",
           "O-38",
-          "R14"
+          "R14",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -8718,7 +8724,8 @@
           "O-24",
           "O-33A",
           "O-41A",
-          "R13B"
+          "R13B",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -16075,7 +16082,8 @@
           "O-24",
           "O-33A",
           "O-41A",
-          "R13B"
+          "R13B",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -19591,7 +19599,8 @@
         "sentidos_atendidos": "IDA",
         "rotas": [
           "E4",
-          "E5"
+          "E5",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -21239,7 +21248,8 @@
         "sentidos_atendidos": "IDA",
         "rotas": [
           "R7",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -21310,7 +21320,8 @@
           "D6B",
           "E6",
           "E7",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -21409,7 +21420,8 @@
           "C7",
           "D6A",
           "D6B",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -22908,7 +22920,8 @@
         "rotas": [
           "E6",
           "E7",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -22948,7 +22961,8 @@
           "D6A",
           "E6",
           "E7",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -24078,7 +24092,8 @@
         "sentidos_atendidos": "VOLTA",
         "rotas": [
           "C2",
-          "R14"
+          "R14",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -24470,7 +24485,8 @@
         "rotas": [
           "E6",
           "E7",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -24590,7 +24606,8 @@
         "rotas": [
           "C1",
           "C7",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -24713,7 +24730,8 @@
         "rotas": [
           "E6",
           "E7",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -25188,7 +25206,8 @@
         "sentidos_atendidos": "IDA",
         "rotas": [
           "C1",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -25225,7 +25244,8 @@
         "sentidos_atendidos": "IDA",
         "rotas": [
           "E6",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -25266,7 +25286,8 @@
           "C7",
           "D6A",
           "D6B",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -25469,7 +25490,8 @@
         "rotas": [
           "D7",
           "E7",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -27250,10 +27272,12 @@
         "sentidos_atendidos": "IDA",
         "rotas": [
           "B9",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
-          "domingos_feriados"
+          "domingos_feriados",
+          "dias_uteis_sabados"
         ],
         "dia_rotulo": "Dias úteis, sábados, domingos e feriados",
         "integracoes_descricao": [],
@@ -27286,7 +27310,8 @@
         "sentidos_atendidos": "IDA",
         "rotas": [
           "R8",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -30686,7 +30711,8 @@
           "C7",
           "D6B",
           "R7",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -32153,7 +32179,8 @@
         "sentidos_atendidos": "IDA",
         "rotas": [
           "R7",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -41601,7 +41628,8 @@
         "acessivel": "sim",
         "sentidos_atendidos": "IDA",
         "rotas": [
-          "C8"
+          "C8",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -60976,7 +61004,8 @@
         "acessivel": "sim",
         "sentidos_atendidos": "IDA",
         "rotas": [
-          "D6A"
+          "D6A",
+          "N-15"
         ],
         "dias_semana": [
           "domingos_feriados",
@@ -105907,7 +105936,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -105936,7 +105966,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -105965,7 +105996,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -105994,7 +106026,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -106023,7 +106056,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -106052,7 +106086,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -106110,7 +106145,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -106139,7 +106175,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -106168,7 +106205,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -106197,7 +106235,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -106310,7 +106349,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -106339,7 +106379,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -106368,7 +106409,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -106397,7 +106439,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -106426,7 +106469,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -106567,7 +106611,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -107205,7 +107250,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -107234,7 +107280,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -107263,7 +107310,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -107349,7 +107397,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -107378,7 +107427,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -107407,7 +107457,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -107436,7 +107487,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -107465,7 +107517,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -107494,7 +107547,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -107523,7 +107577,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -107755,7 +107810,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -107784,7 +107840,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -107813,7 +107870,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -107842,7 +107900,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -107871,7 +107930,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -107900,7 +107960,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -107929,7 +107990,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -108439,7 +108501,8 @@
         "acessivel": "sim",
         "rotas": [
           "NOVA",
-          "N-02"
+          "N-02",
+          "N-15"
         ],
         "dias_semana": [
           "dias_uteis_sabados"
@@ -108512,6 +108575,276 @@
         "coordinates": [
           -35.238,
           -5.75415
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "MOV-70749877",
+        "nome": "Avenida Pirassununga, 126a",
+        "lat": -5.723978,
+        "lng": -35.249333,
+        "bairro": "Lagoa Azul",
+        "tipo": "parada",
+        "origem": "moovit",
+        "ativo": true,
+        "acessivel": "sim",
+        "sentidos_atendidos": "IDA",
+        "rotas": [
+          "N-15"
+        ],
+        "dias_semana": [
+          "dias_uteis_sabados"
+        ],
+        "dia_rotulo": "Dias úteis e sábados",
+        "integracoes_descricao": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -35.249333,
+          -5.723978
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "MOV-5482883",
+        "nome": "Rua Padre Manoel da Nóbrega, 171",
+        "lat": -5.727158,
+        "lng": -35.244581,
+        "bairro": "Pajuçara",
+        "tipo": "parada",
+        "origem": "moovit",
+        "ativo": true,
+        "acessivel": "sim",
+        "sentidos_atendidos": "IDA",
+        "rotas": [
+          "N-15"
+        ],
+        "dias_semana": [
+          "dias_uteis_sabados"
+        ],
+        "dia_rotulo": "Dias úteis e sábados",
+        "integracoes_descricao": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -35.244581,
+          -5.727158
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "MOV-35377112",
+        "nome": "Av. Felizardo Firmino Moura, 3901 — Ponte de Igapó",
+        "lat": -5.785826,
+        "lng": -35.246093,
+        "bairro": "Nordeste",
+        "tipo": "parada",
+        "origem": "moovit",
+        "ativo": true,
+        "acessivel": "sim",
+        "sentidos_atendidos": "IDA",
+        "rotas": [
+          "N-15"
+        ],
+        "dias_semana": [
+          "dias_uteis_sabados"
+        ],
+        "dia_rotulo": "Dias úteis e sábados",
+        "integracoes_descricao": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -35.246093,
+          -5.785826
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "MOV-562664286",
+        "nome": "Av. Felizardo Firmino Moura, 258 — Compal",
+        "lat": -5.791581,
+        "lng": -35.24372,
+        "bairro": "Nordeste",
+        "tipo": "parada",
+        "origem": "moovit",
+        "ativo": true,
+        "acessivel": "sim",
+        "sentidos_atendidos": "IDA",
+        "rotas": [
+          "N-15"
+        ],
+        "dias_semana": [
+          "dias_uteis_sabados"
+        ],
+        "dia_rotulo": "Dias úteis e sábados",
+        "integracoes_descricao": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -35.24372,
+          -5.791581
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "MOV-8091159",
+        "nome": "Praça Augusto Severo — Plataforma Zona Norte",
+        "lat": -5.779998,
+        "lng": -35.205938,
+        "bairro": "Ribeira",
+        "tipo": "parada",
+        "origem": "moovit",
+        "ativo": true,
+        "acessivel": "sim",
+        "sentidos_atendidos": "AMBOS",
+        "rotas": [
+          "N-15"
+        ],
+        "dias_semana": [
+          "dias_uteis_sabados"
+        ],
+        "dia_rotulo": "Dias úteis e sábados",
+        "integracoes_descricao": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -35.205938,
+          -5.779998
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "MOV-5481796",
+        "nome": "Rua Doutor Mario Negócio, 1988",
+        "lat": -5.797285,
+        "lng": -35.231871,
+        "bairro": "Quintas",
+        "tipo": "parada",
+        "origem": "moovit",
+        "ativo": true,
+        "acessivel": "sim",
+        "sentidos_atendidos": "VOLTA",
+        "rotas": [
+          "N-15"
+        ],
+        "dias_semana": [
+          "dias_uteis_sabados"
+        ],
+        "dia_rotulo": "Dias úteis e sábados",
+        "integracoes_descricao": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -35.231871,
+          -5.797285
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "MOV-8091161",
+        "nome": "Av. Felizardo Firmino Moura, 3900 — Comunidade do Mosquito",
+        "lat": -5.785876,
+        "lng": -35.245818,
+        "bairro": "Nordeste",
+        "tipo": "parada",
+        "origem": "moovit",
+        "ativo": true,
+        "acessivel": "sim",
+        "sentidos_atendidos": "VOLTA",
+        "rotas": [
+          "N-15"
+        ],
+        "dias_semana": [
+          "dias_uteis_sabados"
+        ],
+        "dia_rotulo": "Dias úteis e sábados",
+        "integracoes_descricao": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -35.245818,
+          -5.785876
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "MOV-5482892",
+        "nome": "Rua Barão de Grajaú, 212",
+        "lat": -5.724095,
+        "lng": -35.242514,
+        "bairro": "Pajuçara",
+        "tipo": "parada",
+        "origem": "moovit",
+        "ativo": true,
+        "acessivel": "sim",
+        "sentidos_atendidos": "VOLTA",
+        "rotas": [
+          "N-15"
+        ],
+        "dias_semana": [
+          "dias_uteis_sabados"
+        ],
+        "dia_rotulo": "Dias úteis e sábados",
+        "integracoes_descricao": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -35.242514,
+          -5.724095
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "MOV-70749878",
+        "nome": "Rua Doutor Júlio de Mesquita, 137a",
+        "lat": -5.723588,
+        "lng": -35.24291,
+        "bairro": "Pajuçara",
+        "tipo": "parada",
+        "origem": "moovit",
+        "ativo": true,
+        "acessivel": "sim",
+        "sentidos_atendidos": "VOLTA",
+        "rotas": [
+          "N-15"
+        ],
+        "dias_semana": [
+          "dias_uteis_sabados"
+        ],
+        "dia_rotulo": "Dias úteis e sábados",
+        "integracoes_descricao": []
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -35.24291,
+          -5.723588
         ]
       }
     }

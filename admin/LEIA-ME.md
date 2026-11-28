@@ -58,3 +58,35 @@ conversa, gere uma nova no lançamento.
 Ficam em `dados-admin/` (fora do Git e bloqueado para acesso pelo navegador):
 `acessos.jsonl` (entradas), `avisos.json`, `notas.json` e `estatisticas.json` (contagens anônimas).
 O log de alterações continua em `dados/auditoria-admin.jsonl`.
+
+## Banco de dados (PostgreSQL) e mudanças pelo GitHub
+
+Com `DATABASE_URL` definido, o banco guarda o que é editado e publicado no painel. A cada início
+(deploy), o servidor **restaura do banco** `linhas.json`, `paradas.json`, `linha_paradas.json` e
+`lote-1/2.geojson`, por cima dos arquivos do GitHub.
+
+Por isso, quem mudar esses arquivos direto no código (à mão ou por script) precisa gerar uma
+**migração de dados** antes do commit:
+
+```
+npm run dados:migracao -- "o que mudou"
+```
+
+Ela cria `dados/migracoes/AAAA-MM-DD-....json` só com o que mudou (por linha, parada, traçado e
+grupo linha+dia de vínculos). No deploy, depois de restaurar o banco, o servidor aplica as
+migrações que ainda não rodaram e grava o resultado no banco (tabela `buzu_migracoes` registra as
+já aplicadas). O resto continua como está no banco, inclusive o que foi editado no painel.
+Se a mesma linha/parada foi editada nos dois lugares, vale a versão da migração.
+
+Mudanças feitas pelo editor do painel e **publicadas** não precisam de migração.
+
+## Importar traçado do Moovit
+
+No editor do mapa (`/use-admin/editor`): abra a linha e o dia, e em *Arquivos e outros dias*
+clique em **Importar do Moovit**. Na primeira vez, arraste o botão *Exportar para o BuzuRota* para
+a barra de favoritos. No editor do Moovit, abra a viagem ativa da linha (`/editor/trip/…`),
+clique no favorito e escolha o arquivo baixado no BuzuRota.
+
+Do Moovit vêm só o **caminho** e as **paradas**: horários e frequências continuam os do edital.
+Paradas do Moovit que não existem no BuzuRota (nenhuma a até 25 m) são criadas ao salvar, com
+origem `moovit`; as que já existem são ligadas à linha. A senha do Moovit nunca passa pelo BuzuRota.

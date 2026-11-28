@@ -101,6 +101,15 @@ function criarBanco() {
       );
     `);
 
+    // Migrações de dados do GitHub já aplicadas sobre o conteúdo do banco (ver admin/migracoes-dados.js)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS buzu_migracoes (
+        id TEXT PRIMARY KEY,
+        descricao TEXT NOT NULL DEFAULT '',
+        aplicado_em TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+
     await pool.query(`
       CREATE TABLE IF NOT EXISTS buzu_backups (
         versao TEXT PRIMARY KEY,
@@ -229,6 +238,56 @@ function criarBanco() {
   /**
    * Conecta no PostgreSQL e restaura os dados persistidos para o disco local do container.
    */
+  async function aplicarMigracoesDados(DADOS_DIR, mapaDocs) {
+    const pasta = path.join(DADOS_DIR, 'migracoes');
+    if (!fs.existsSync(pasta)) return [];
+    const { TIPOS, aplicarOperacoes, serializarComo } = require('./migracoes-dados');
+    const arquivos = fs
+      .readdirSync(pasta)
+      .filter(n => /^[\w.-]+\.json$/.test(n))
+      .sort();
+    if (!arquivos.length) return [];
+    const jaAplicadas = new Set((await pool.query('SELECT id FROM buzu_migracoes')).rows.map(r => r.id));
+    const aplicadas = [];
+    for (const nomeArq of arquivos) {
+      let mig;
+      try {
+        mig = JSON.parse(fs.readFileSync(path.join(pasta, nomeArq), 'utf8'));
+      } catch (err) {
+        console.error(`[Banco] Migração ${nomeArq} ilegível: ${err.message}`);
+        continue;
+      }
+      const id = String(mig.id || nomeArq.replace(/\.json$/, ''));
+      if (jaAplicadas.has(id)) continue;
+      try {
+        for (const [nome, ops] of Object.entries(mig.arquivos || {})) {
+          const tipo = TIPOS[nome];
+          if (!tipo) throw new Error(`arquivo não gerenciado: ${nome}`);
+          const caminho = path.join(DADOS_DIR, nome);
+          const textoAtual = fs.readFileSync(caminho, 'utf8');
+          const novoTexto = serializarComo(textoAtual, aplicarOperacoes(tipo, JSON.parse(textoAtual), ops));
+          gravarAtomico(caminho, novoTexto);
+          // Se o banco já guardava este arquivo, guarda a versão com a migração aplicada.
+          // (Sem cópia no banco, o arquivo do GitHub já é a versão em uso e contém a mudança.)
+          const chave = `dados/${nome}`;
+          if (mapaDocs.has(chave)) {
+            await salvarDocumento(chave, novoTexto, `migracao:${id}`);
+            mapaDocs.set(chave, novoTexto);
+          }
+        }
+        await pool.query('INSERT INTO buzu_migracoes (id, descricao) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING', [
+          id,
+          String(mig.descricao || '').slice(0, 500)
+        ]);
+        aplicadas.push(id);
+        console.log(`[Banco] Migração de dados aplicada: ${id}${mig.descricao ? ` — ${mig.descricao}` : ''}`);
+      } catch (err) {
+        console.error(`[Banco] Falha ao aplicar a migração ${id}: ${err.message}`);
+      }
+    }
+    return aplicadas;
+  }
+
   async function inicializar({ DADOS_DIR, PASTA_ADMIN, BACKUPS_DIR, ARQ_AUDITORIA }) {
     if (!url) {
       return { ativo: false, motivo: 'DATABASE_URL não definida (usando arquivos locais)' };
@@ -301,6 +360,14 @@ function criarBanco() {
         }
       } else {
         console.log('[Banco] BUZU_DB_FORCAR_GIT=1 ativo: mantendo arquivos dados/ do Git.');
+      }
+
+      // 1b. Mudanças de dados feitas no GitHub (dados/migracoes/*.json) entram por cima do que veio
+      // do banco, sem apagar o que foi editado no painel. Cada migração roda uma vez só.
+      // Com BUZU_DB_FORCAR_GIT=1 o banco não foi restaurado: as migrações ficam para o próximo início normal.
+      if (!forcarGit) {
+        const aplicadas = await aplicarMigracoesDados(DADOS_DIR, mapaDocs);
+        if (aplicadas.length) restaurados.push(`migrações (${aplicadas.join(', ')})`);
       }
 
       // 2. Restaura ou semeia empresas (tabela relacional buzu_empresas)

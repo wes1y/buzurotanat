@@ -698,8 +698,51 @@
     if (!ida.length && !confirm(`O traçado da linha ${numero} está vazio. Salvar assim remove o traçado deste dia. Continuar?`)) return;
     const coords = volta.length > 1 ? [...ida, ...volta] : ida;
     const meta = { ...metaDaLinha(numero), ...(volta.length > 1 ? { indice_retorno: ida.length - 1 } : {}) };
+    const doMoovit = ed.importMoovit && coords.length ? ed.importMoovit : null;
+    if (doMoovit) meta.itinerario_ruas = doMoovit.itinerario_ruas;
     ocupado(true, 'Salvando traçado e recalculando paradas…');
     try {
+      // Paradas do Moovit que faltavam: entram antes de recalcular, para já ficarem ligadas à linha
+      let criadas = 0;
+      if (doMoovit?.paradasNovas?.length) {
+        const lista = E().paradas.features;
+        const bairroPerto = (lat, lng) => {
+          let m = null;
+          for (const f of lista) {
+            const b = f.properties?.bairro;
+            if (!b) continue;
+            const [x, y] = f.geometry.coordinates;
+            if (Math.abs(y - lat) > 0.01 || Math.abs(x - lng) > 0.01) continue;
+            const d = U.calcularDistanciaGeodesica(lat, lng, y, x);
+            if (!m || d < m.d) m = { d, b };
+          }
+          return m && m.d < 800 ? m.b : null;
+        };
+        for (const p of doMoovit.paradasNovas) {
+          if (paradaDe(p.id)) continue; // já criada num import anterior
+          lista.push({
+            type: 'Feature',
+            properties: {
+              id: p.id,
+              nome: p.nome,
+              lat: p.lat,
+              lng: p.lng,
+              bairro: bairroPerto(p.lat, p.lng) || undefined,
+              tipo: p.tipo,
+              origem: 'moovit',
+              ativo: true,
+              acessivel: 'sim',
+              sentidos_atendidos: p.sentido,
+              rotas: [],
+              dias_semana: [dia],
+              dia_rotulo: DIAS[dia],
+              integracoes_descricao: []
+            },
+            geometry: { type: 'Point', coordinates: [p.lng, p.lat] }
+          });
+          criadas++;
+        }
+      }
       const res = await D.atualizarRotaNoMapa(numero, dia, coords, meta);
       const f = featureDe(numero, dia);
       if (f && coords.length) {
@@ -707,15 +750,26 @@
         f.properties.coordenadas_volta = volta.length > 1 ? volta : [];
         f.properties.pontos_guia_ida = ed.guia.ida;
         f.properties.pontos_guia_volta = ed.guia.volta;
-        await D.salvarOverrideAdmin({ publicar: false });
+        if (doMoovit) {
+          f.properties.fonte = 'Moovit';
+          const variante = linhaDe(numero)?.variantes_dia?.[dia];
+          if (variante) variante.fonte_rota = doMoovit.fonte_rota;
+        } else if (f.properties.fonte === 'Moovit') {
+          // traçado mexido à mão depois do import: deixa de ser cópia fiel do Moovit
+          f.properties.fonte = 'Moovit (ajustado no editor)';
+        }
+        await D.salvarOverrideAdmin({ publicar: false, resumoAcao: doMoovit ? `Rota ${numero} (${dia}) importada do Moovit` : '' });
       }
+      ed.importMoovit = null;
       ed.sujo = false;
       ed.pilha = [];
       ed.refazer = [];
       toast(
         res?.removida
           ? `Traçado da linha ${numero} removido deste dia (no rascunho).`
-          : `Traçado salvo no rascunho: ${String(res.extensao_km).replace('.', ',')} km • ${res.paradasIda} paradas na ida e ${res.paradasVolta} na volta.`
+          : `Traçado salvo no rascunho: ${String(res.extensao_km).replace('.', ',')} km • ${res.paradasIda} paradas na ida e ${res.paradasVolta} na volta${
+              criadas ? ` • ${criadas} parada(s) nova(s) do Moovit criadas` : ''
+            }.`
       );
       depoisDeAlterarDados();
     } catch (err) {
@@ -1026,6 +1080,7 @@
       </div>
       <div class="ed-bloco"><h3><i class="bi bi-arrow-down-up"></i>Arquivos e outros dias</h3>
         <div class="ed-acoes-grade">
+          <button type="button" class="btn" data-acao="importar-moovit"><i class="bi bi-box-arrow-in-down"></i> Importar do Moovit</button>
           <button type="button" class="btn" data-acao="importar"><i class="bi bi-upload"></i> Importar KML/GeoJSON</button>
           <button type="button" class="btn" data-acao="exportar-geojson"><i class="bi bi-filetype-json"></i> Baixar GeoJSON</button>
           <button type="button" class="btn" data-acao="exportar-kml"><i class="bi bi-globe-americas"></i> Baixar KML</button>
@@ -1105,6 +1160,9 @@
         return;
       case 'importar':
         $('#ed-arquivo').click();
+        return;
+      case 'importar-moovit':
+        abrirDialogoMoovit();
         return;
       case 'exportar-geojson':
         exportarGeoJson(numero);
@@ -1725,7 +1783,14 @@
       let trechos = [];
       if (nome.endsWith('.kmz')) trechos = linhasDeKml(await kmlDeKmz(arquivo));
       else if (nome.endsWith('.kml')) trechos = linhasDeKml(await arquivo.text());
-      else trechos = linhasDeGeoJson(JSON.parse(await arquivo.text()));
+      else {
+        const json = JSON.parse(await arquivo.text());
+        if (json?.formato === 'buzurota-moovit') {
+          mostrarImportMoovit(json);
+          return;
+        }
+        trechos = linhasDeGeoJson(json);
+      }
       if (!trechos.length) throw new Error('nenhuma linha (LineString) encontrada');
       registrarPasso();
       if (trechos.length >= 2 && confirm(`O arquivo tem ${trechos.length} traçados. Usar o 1º como IDA e o 2º como VOLTA?\n\n(Cancelar = usar só o 1º no sentido que você está editando)`)) {
@@ -1742,6 +1807,279 @@
     } catch (err) {
       toast(`Não foi possível importar: ${err.message}`, true);
     }
+  }
+
+  // ------------------------------------------------------------------ importar do Moovit
+  // O favorito roda DENTRO do editor do Moovit (com o login da própria pessoa), pede os dados da
+  // viagem aberta à mesma API que a página usa e baixa um arquivo .json. Nada de senha passa pelo BuzuRota.
+  function favoritoExportarMoovit() {
+    (async () => {
+      try {
+        const m = location.pathname.match(/\/editor\/trip\/(\d+)/);
+        if (!/(^|\.)moovit\.com$/.test(location.hostname) || !m) {
+          alert('Abra uma VIAGEM no editor do Moovit (endereço /editor/trip/…) e clique de novo no favorito.');
+          return;
+        }
+        const ds = Number(new URLSearchParams(location.search).get('dataSourceId')) || undefined;
+        const r = await fetch('/api/trip-settings/trip-settings-full-details-v2', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ tripSettingsId: Number(m[1]), dataSourceId: ds })
+        });
+        if (!r.ok) throw new Error(`o Moovit respondeu ${r.status}`);
+        const fd = (await r.json()).fullDetails;
+        if (!fd || !Array.isArray(fd.stops) || !Array.isArray(fd.stopPairSegments)) throw new Error('dados da viagem incompletos');
+        // Só o caminho e as paradas: horários e frequências do Moovit ficam de fora (o BuzuRota usa os do edital)
+        const saida = {
+          formato: 'buzurota-moovit',
+          versao: 2,
+          exportado_em: new Date().toISOString(),
+          viagem: Number(m[1]),
+          endereco: location.href,
+          linha: fd.shortName || '',
+          nome: fd.longName || '',
+          ativa: fd.isActive !== false,
+          paradas: fd.stops.map(s => ({ id: s.stopId, nome: s.stopName, lat: s.location.latitude, lng: s.location.longitude })),
+          trechos: fd.stopPairSegments.map(x => ({ de: x.fromStopId, para: x.toStopId, forma: x.encodedPolylineShape || '' }))
+        };
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([JSON.stringify(saida)], { type: 'application/json' }));
+        a.download = `moovit-${(fd.shortName || 'linha').replace(/[^\w-]+/g, '')}-${m[1]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      } catch (err) {
+        alert(`Não consegui exportar esta viagem do Moovit: ${err.message}`);
+      }
+    })();
+  }
+  const HREF_FAVORITO_MOOVIT = `javascript:${encodeURIComponent(`(${favoritoExportarMoovit.toString()})()`)}`;
+
+  /** Polilinha codificada (formato Google, 5 casas) → [[lng, lat], ...] */
+  function decodificarPolilinha(str) {
+    const out = [];
+    let i = 0, lat = 0, lng = 0;
+    while (i < str.length) {
+      for (const eixo of ['lat', 'lng']) {
+        let b, s = 0, r = 0;
+        do {
+          b = str.charCodeAt(i++) - 63;
+          r |= (b & 31) << s;
+          s += 5;
+        } while (b >= 32);
+        const d = r & 1 ? ~(r >> 1) : r >> 1;
+        if (eixo === 'lat') lat += d;
+        else lng += d;
+      }
+      out.push([arred(lng / 1e5), arred(lat / 1e5)]);
+    }
+    return out;
+  }
+
+  let importMoovit = null; // { dados, coords, idxParada, retorno }
+
+  /** Monta o traçado do circuito e o índice (no traçado) de cada parada do Moovit */
+  function prepararMoovit(dados) {
+    const coords = [];
+    const idxParada = [];
+    dados.trechos.forEach((t, k) => {
+      idxParada.push(coords.length ? coords.length - 1 : 0);
+      let pts = decodificarPolilinha(t.forma || '');
+      if (pts.length < 2) {
+        const a = dados.paradas[k], b = dados.paradas[k + 1];
+        pts = a && b ? [[arred(a.lng), arred(a.lat)], [arred(b.lng), arred(b.lat)]] : pts;
+      }
+      for (const p of pts) {
+        const u = coords[coords.length - 1];
+        if (!u || u[0] !== p[0] || u[1] !== p[1]) coords.push(p);
+      }
+    });
+    idxParada.push(coords.length - 1);
+    return { coords, idxParada };
+  }
+
+  // Paradas do Moovit que ainda não existem no BuzuRota (nenhuma parada ativa a até 25 m)
+  const RAIO_PARADA_EXISTENTE_M = 25;
+  function paradasQueFaltam(dados, iRet) {
+    const ativas = paradas().filter(f => f.properties?.ativo !== false);
+    const n = dados.paradas.length;
+    const faltam = [];
+    dados.paradas.forEach((p, i) => {
+      if (i === n - 1 && dados.paradas[0] && U.calcularDistanciaGeodesica(p.lat, p.lng, dados.paradas[0].lat, dados.paradas[0].lng) < 30) return; // fim = início do circuito
+      const perto = ativas.some(f => {
+        const [x, y] = f.geometry.coordinates;
+        return Math.abs(y - p.lat) < 0.001 && Math.abs(x - p.lng) < 0.001 && U.calcularDistanciaGeodesica(p.lat, p.lng, y, x) <= RAIO_PARADA_EXISTENTE_M;
+      });
+      if (perto || faltam.some(q => U.calcularDistanciaGeodesica(p.lat, p.lng, q.lat, q.lng) <= RAIO_PARADA_EXISTENTE_M)) return;
+      const [rua, referencia] = String(p.nome || '').split('|').map(s => s.replace(/\s+/g, ' ').trim());
+      faltam.push({
+        id: `MOV-${p.id || `${arred(p.lat)}_${arred(p.lng)}`}`,
+        nome: (referencia ? `${rua} — ${referencia}` : rua || 'Parada').slice(0, 120),
+        lat: arred(p.lat),
+        lng: arred(p.lng),
+        tipo: /terminal/i.test(p.nome) ? 'terminal' : 'parada',
+        // no circuito, a parada fica do lado da via do sentido em que o ônibus passa
+        sentido: i < iRet ? 'IDA' : i > iRet ? 'VOLTA' : 'AMBOS'
+      });
+    });
+    return faltam;
+  }
+
+  /**
+   * Sugere o retorno de um circuito: o ponto em que ida e volta ficam mais "espelhadas"
+   * (cada parada de um lado tem uma parada perto do outro lado). Num laço no fim da linha
+   * vários pontos empatam; entre os empatados (até 4% de diferença) fica o último, que é
+   * onde a volta de fato começa.
+   */
+  function sugerirRetorno(dados) {
+    const P = dados.paradas.map(p => [p.lng, p.lat]);
+    const n = P.length;
+    if (n < 5) return Math.max(1, Math.floor(n / 2));
+    const d = (a, b) => Math.hypot((b[0] - a[0]) * Math.cos((a[1] * Math.PI) / 180) * 111320, (b[1] - a[1]) * 110540);
+    const custos = [];
+    for (let i = 2; i < n - 2; i++) {
+      let c = 0;
+      for (let j = 0; j <= i; j++) { let m = Infinity; for (let k = i; k < n; k++) m = Math.min(m, d(P[j], P[k])); c += m; }
+      for (let j = i; j < n; j++) { let m = Infinity; for (let k = 0; k <= i; k++) m = Math.min(m, d(P[j], P[k])); c += m; }
+      custos.push({ i, c });
+    }
+    const menor = Math.min(...custos.map(x => x.c));
+    return Math.max(...custos.filter(x => x.c <= menor * 1.04).map(x => x.i));
+  }
+
+  function abrirDialogoMoovit() {
+    if (!ed) {
+      toast('Abra primeiro a linha e o dia que vão receber o traçado.', true);
+      return;
+    }
+    $('#moovit-passo-1').hidden = false;
+    $('#moovit-passo-2').hidden = true;
+    $('#dlg-moovit').showModal();
+  }
+
+  function mostrarImportMoovit(dados) {
+    if (!ed) return;
+    if (!Array.isArray(dados.paradas) || !Array.isArray(dados.trechos) || dados.trechos.length !== dados.paradas.length - 1) {
+      throw new Error('o arquivo do Moovit está incompleto (paradas e trechos não batem)');
+    }
+    const { coords, idxParada } = prepararMoovit(dados);
+    if (coords.length < 3) throw new Error('o traçado do Moovit veio vazio');
+    importMoovit = { dados, coords, idxParada };
+
+    const avisos = [];
+    const linhaMoovit = String(dados.linha || '').toUpperCase().replace(/\s+/g, '');
+    if (linhaMoovit && linhaMoovit !== String(ed.numero).toUpperCase()) {
+      avisos.push(`O arquivo é da linha <strong>${esc(dados.linha)}</strong>, mas você está editando a <strong>${esc(ed.numero)}</strong>.`);
+    }
+    if (dados.ativa === false) avisos.push('Esta viagem está <strong>inativa</strong> no Moovit (pode estar desatualizada).');
+
+    $('#moovit-resumo').innerHTML = `
+      <div class="ed-moovit-resumo">
+        <div>Linha no Moovit<strong>${esc(dados.linha || '—')}</strong></div>
+        <div>Viagem<strong>${esc(dados.nome || dados.viagem)}</strong></div>
+        <div>Vai para<strong>${esc(ed.numero)} • ${esc(DIAS[ed.dia])}</strong></div>
+        <div>Circuito<strong>${fmtKm(comprimento(coords))} • ${fmtNum(dados.paradas.length)} paradas</strong></div>
+      </div>
+      <p>Só o caminho e as paradas vêm do Moovit. Horários e frequências continuam os do edital.</p>
+      ${avisos.length ? `<div class="ed-validacao ed-validacao--alerta"><ul>${avisos.map(a => `<li>${a}</li>`).join('')}</ul></div>` : ''}`;
+
+    const sugerido = sugerirRetorno(dados);
+    $('#moovit-retorno').innerHTML = dados.paradas
+      .map((p, i) =>
+        i === 0 || i === dados.paradas.length - 1
+          ? ''
+          : `<option value="${i}" ${i === sugerido ? 'selected' : ''}>${i + 1}. ${esc(p.nome)}${i === sugerido ? ' (sugerido: o ponto mais longe do início)' : ''}</option>`
+      )
+      .join('');
+    const info = () => {
+      const i = Number($('#moovit-retorno').value);
+      const ret = idxParada[i];
+      const novas = paradasQueFaltam(dados, i).length;
+      $('#moovit-retorno-info').textContent =
+        `Ida: paradas 1 a ${i + 1} (${fmtKm(comprimento(coords.slice(0, ret + 1)))}) • Volta: paradas ${i + 1} a ${dados.paradas.length} (${fmtKm(comprimento(coords.slice(ret)))}). ` +
+        (novas
+          ? `${novas} parada(s) do Moovit ainda não existem no BuzuRota e serão criadas ao salvar; as outras já existem e são ligadas à linha.`
+          : 'Todas as paradas do Moovit já existem no BuzuRota e serão ligadas à linha.');
+    };
+    $('#moovit-retorno').onchange = info;
+    info();
+    $('#moovit-passo-1').hidden = true;
+    $('#moovit-passo-2').hidden = false;
+    if (!$('#dlg-moovit').open) $('#dlg-moovit').showModal();
+  }
+
+  /** Lista de ruas a partir dos nomes das paradas do Moovit ("Av. Tal, 123 | Referência") */
+  function ruasDasParadasMoovit(paradas) {
+    const estado = D.obterEstado();
+    const bairroPerto = (lat, lng) => {
+      let m = null;
+      for (const f of estado.paradas?.features || []) {
+        const b = f.properties?.bairro;
+        if (!b) continue;
+        const [x, y] = f.geometry.coordinates;
+        if (Math.abs(y - lat) > 0.01 || Math.abs(x - lng) > 0.01) continue;
+        const d = U.calcularDistanciaGeodesica(lat, lng, y, x);
+        if (!m || d < m.d) m = { d, b };
+      }
+      return m && m.d < 600 ? m.b : 'Natal';
+    };
+    // mesma rua com grafias diferentes ("Av." / "Avenida", "Faria" / "Farias") conta uma vez só
+    const chave = s =>
+      U.normalizarTexto(s)
+        .replace(/^(av\.?|avenida)\s+/, 'av ')
+        .replace(/^(r\.|rua)\s+/, 'rua ')
+        .replace(/[^a-z0-9 ]/g, '')
+        .trim();
+    const mesma = (a, b) => {
+      const x = chave(a), y = chave(b);
+      return x === y || x.startsWith(y) || y.startsWith(x);
+    };
+    const lista = [];
+    for (const p of paradas) {
+      let nome = String(p.nome || '').split('|')[0].split(',')[0].replace(/\s+/g, ' ').trim();
+      if (!/^(rua|r\.|av\.?|avenida|travessa|tv\.|praça|pça|estrada|rodovia|br-|rn-|alameda|ponte|viaduto|túnel)(\s|$)/i.test(nome)) continue;
+      nome = nome.replace(/ (De|Da|Do|Das|Dos|E) /g, m => m.toLowerCase());
+      const ult = lista[lista.length - 1];
+      if (ult && mesma(ult.logradouro, nome)) continue;
+      lista.push({ ordem: lista.length + 1, logradouro: nome, bairro: bairroPerto(p.lat, p.lng), lat: arred(p.lat), lng: arred(p.lng) });
+    }
+    return lista;
+  }
+
+  function aplicarImportMoovit() {
+    if (!ed || !importMoovit) return;
+    const { dados, coords, idxParada } = importMoovit;
+    const iRet = Number($('#moovit-retorno').value);
+    const ret = idxParada[iRet];
+    if (!(ret > 0 && ret < coords.length - 1)) {
+      toast('Escolha um ponto de retorno no meio do trajeto.', true);
+      return;
+    }
+    registrarPasso();
+    ed.ida = coords.slice(0, ret + 1);
+    ed.volta = coords.slice(ret);
+    ed.guia = { ida: [], volta: [] };
+    ed.importMoovit = {
+      itinerario_ruas: {
+        ida: ruasDasParadasMoovit(dados.paradas.slice(0, iRet + 1)),
+        volta: ruasDasParadasMoovit(dados.paradas.slice(iRet))
+      },
+      paradasNovas: paradasQueFaltam(dados, iRet),
+      fonte_rota: {
+        tipo: 'Moovit (comunidade)',
+        referencia: `Viagem ${dados.viagem}${dados.nome ? ` "${dados.nome}"` : ''} — só traçado e paradas (horários e frequências seguem o edital)`,
+        consultado_em: String(dados.exportado_em || '').slice(0, 10),
+        metodo: `Traçado e paradas exportados do editor do Moovit; volta a partir de ${dados.paradas[iRet].nome}`
+      }
+    };
+    importMoovit = null;
+    geometriaAlterada();
+    enquadrarSelecao();
+    const novas = ed.importMoovit.paradasNovas.length;
+    toast(
+      `Traçado do Moovit carregado (${fmtKm(comprimento(coords))}${novas ? `; ${novas} parada(s) nova(s) serão criadas ao salvar` : ''}). Confira no mapa e clique em "Salvar traçado".`
+    );
   }
 
   function exportarGeoJson(numero) {
@@ -2203,6 +2541,16 @@
     $('#ed-coord').addEventListener('click', () => {
       const t = $('#ed-coord').textContent;
       if (t && t !== '—') navigator.clipboard?.writeText(t).then(() => toast(`Coordenada copiada: ${t}`));
+    });
+    $('#moovit-favorito').setAttribute('href', HREF_FAVORITO_MOOVIT);
+    $('#moovit-favorito').addEventListener('click', e => {
+      e.preventDefault();
+      toast('Arraste este botão para a barra de favoritos e use-o dentro do editor do Moovit.');
+    });
+    $('#moovit-escolher').addEventListener('click', () => $('#ed-arquivo').click());
+    $('#form-moovit').addEventListener('submit', e => {
+      if (e.submitter?.value === 'usar') aplicarImportMoovit();
+      else importMoovit = null;
     });
     $('#ed-arquivo').addEventListener('change', e => {
       const a = e.target.files?.[0];
